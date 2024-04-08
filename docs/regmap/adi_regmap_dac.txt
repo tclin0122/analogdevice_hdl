@@ -542,6 +542,7 @@ fixed point (signed, integer, fractional). The DDS in general runs on 16-bits,
 note that if you do use both channels and set both scale to 0x4000, it is 
 over-range. The final output is (tone_1_fullscale * scale_1) +
 (tone_2_fullscale * scale_2). NOT-APPLICABLE if DDS_DISABLE is set (0x1).
+DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 ############################################################################################
@@ -559,6 +560,7 @@ DDS_INIT_1[15:0]
 RW
 The DDS phase initialization for tone 1. Sets the initial phase offset 
 of the tone. NOT-APPLICABLE if DDS_DISABLE is set (0x1).
+DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 FIELD
@@ -571,7 +573,7 @@ generated output frequency, and f_if is the frequency of the digital
 interface, and clock_ratio is the ratio between the sampling clock and 
 the interface clock. If DDS_PHASE_DW is greater than 16(from REG_CHAN_CNTRL_1),
 the phase increment for tone 1 is extended in REG_CHAN_CNTRL_9. NOT-APPLICABLE 
-if DDS_DISABLE is set (0x1).
+if DDS_DISABLE is set (0x1). DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 ############################################################################################
@@ -593,6 +595,7 @@ The DDS in general runs on 16-bits, note that if you do use both
 channels and set both scale to 0x4000, it is over-range. The final 
 output is (tone_1_fullscale * scale_1) + (tone_2_fullscale * scale_2). 
 NOT-APPLICABLE if DDS_DISABLE is set (0x1).
+DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 ############################################################################################
@@ -611,7 +614,7 @@ RW
 The DDS phase initialization for tone 2. Sets the initial phase offset of the 
 tone. If DDS_PHASE_DW is greater than 16(from REG_CHAN_CNTRL_1), the phase init 
 for tone 2 is extended in REG_CHAN_CNTRL_10. NOT-APPLICABLE if DDS_DISABLE is 
-set (0x1).
+set (0x1). DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 FIELD
@@ -624,7 +627,7 @@ output frequency, and f_if is the frequency of the digital interface, and
 clock_ratio is the ratio between the sampling clock and the interface clock. 
 If DDS_PHASE_DW is greater than 16(from REG_CHAN_CNTRL_1), the phase increment 
 for tone 2 is extended in REG_CHAN_CNTRL_10. NOT-APPLICABLE if DDS_DISABLE is 
-set (0x1).
+set (0x1). DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 ############################################################################################
@@ -859,7 +862,7 @@ RW
 The extended DDS phase initialization for tone 1. Sets the initial phase offset 
 of the tone. The extended init(phase) value should be calculated according to 
 DDS_PHASE_DW value from REG_CHAN_CNTRL_1 NOT-APPLICABLE if DDS_DISABLE is 
-set (0x1).
+set (0x1). DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 FIELD
@@ -871,7 +874,7 @@ by <m>INCR = (f_out * 2^phaseDW) * clkratio / f_if</m>; Where f_out is the
 generated output frequency, DDS_PHASE_DW value can be found in REG_CHAN_CNTRL_1
 in case DDS_PHASE_DW is not 16, f_if is the frequency of the digital interface, 
 and clock_ratio is the ratio between the sampling clock and the interface clock. 
-NOT-APPLICABLE if DDS_DISABLE is set (0x1).
+NOT-APPLICABLE if DDS_DISABLE is set (0x1). DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 ############################################################################################
@@ -890,7 +893,7 @@ RW
 The extended DDS phase initialization for tone 2. Sets the initial phase offset 
 of the tone. The extended init(phase)  value should be calculated according to 
 DDS_PHASE_DW value from REG_CHAN_CNTRL_2 NOT-APPLICABLE if DDS_DISABLE is 
-set (0x1).
+set (0x1). DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 FIELD
@@ -903,6 +906,7 @@ generated output frequency, DDS_PHASE_DW value can be found in REG_CHAN_CNTRL_2
 in case DDS_PHASE_DW is not 16, f_if is the frequency of the digital interface, 
 and clock_ratio is the ratio between the sampling clock and the interface clock. 
 NOT-APPLICABLE if DDS_DISABLE is set (0x1).
+DDS_DISABLE is parameter in HDL.
 ENDFIELD
 
 ############################################################################################
