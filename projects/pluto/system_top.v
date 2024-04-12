@@ -26,7 +26,7 @@
 //
 //   2. An ADI specific BSD license, which can be found in the top level directory
 //      of this repository (LICENSE_ADIBSD), and also on-line at:
-//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      https://github.com/analogdevicesinc/hdl/blob/master/LICENSE_ADIBSD
 //      This will allow to generate bit files and not release the source code,
 //      as long as it attaches to an ADI device.
 //
@@ -81,7 +81,7 @@ module system_top (
   output          spi_mosi,
   input           spi_miso,
 
-  output          pl_gpio0,
+  input           pl_gpio0,
   input           pl_gpio1,
   inout           pl_gpio2,
   inout           pl_gpio3,
@@ -99,9 +99,7 @@ module system_top (
   wire            phaser_enable;
   wire            pl_burst;
   wire            pl_muxout;
-  wire            pl_spi_clk_o;
-  wire            pl_spi_miso;
-  wire            pl_spi_mosi;
+  wire            pps_s;
   wire            pl_txdata;
 
   // instantiations
@@ -134,12 +132,12 @@ module system_top (
     .dio_p (pl_gpio2));
 
   //PL_GPIO1
-  assign pl_spi_miso = pl_gpio1 & ~phaser_enable;
-  assign pl_burst    = pl_gpio1 &  phaser_enable;
+  //assign pl_spi_miso = pl_gpio1 & ~phaser_enable;
+  //assign pl_burst    = pl_gpio1 &  phaser_enable;
 
   //PL_GPIO0
-  assign pl_gpio0 = phaser_enable ? pl_txdata : pl_spi_mosi;
-
+  assign pps_s = pl_gpio0;
+  
   system_wrapper i_system_wrapper (
     .ddr_addr (ddr_addr),
     .ddr_ba (ddr_ba),
@@ -182,15 +180,8 @@ module system_top (
     .spi0_sdo_i (1'b0),
     .spi0_sdo_o (spi_mosi),
 
-    .spi_clk_i(1'b0),
-    .spi_clk_o(pl_spi_clk_o),
-    .spi_csn_i(1'b1),
-    .spi_csn_o(),
-    .spi_sdi_i(pl_spi_miso),
-    .spi_sdo_i(1'b0),
-    .spi_sdo_o(pl_spi_mosi),
-
-    .tdd_ext_sync(pl_burst),
+    .tdd_sync (pps_s),
+    //.tdd_ext_sync(pl_burst),
     .txdata_o(pl_txdata),
 
     .tx_clk_out (tx_clk_out),

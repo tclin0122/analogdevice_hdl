@@ -1,9 +1,5 @@
-###############################################################################
-## Copyright (C) 2014-2023 Analog Devices, Inc. All rights reserved.
-### SPDX short identifier: ADIBSD
-###############################################################################
-
 # create board design
+
 source $ad_hdl_dir/projects/common/xilinx/adi_fir_filter_bd.tcl
 source $ad_hdl_dir/library/axi_tdd/scripts/axi_tdd.tcl
 
@@ -26,13 +22,6 @@ create_bd_port -dir I -from 17 -to 0 gpio_i
 create_bd_port -dir O -from 17 -to 0 gpio_o
 create_bd_port -dir O -from 17 -to 0 gpio_t
 
-create_bd_port -dir O spi_csn_o
-create_bd_port -dir I spi_csn_i
-create_bd_port -dir I spi_clk_i
-create_bd_port -dir O spi_clk_o
-create_bd_port -dir I spi_sdo_i
-create_bd_port -dir O spi_sdo_o
-create_bd_port -dir I spi_sdi_i
 
 create_bd_port -dir O txdata_o
 create_bd_port -dir I tdd_ext_sync
@@ -104,11 +93,6 @@ ad_ip_parameter sys_rstgen CONFIG.C_EXT_RST_WIDTH 1
 
 # add external spi
 
-ad_ip_instance axi_quad_spi axi_spi
-ad_ip_parameter axi_spi CONFIG.C_USE_STARTUP 0
-ad_ip_parameter axi_spi CONFIG.C_NUM_SS_BITS 1
-ad_ip_parameter axi_spi CONFIG.C_SCK_RATIO 8
-
 ad_connect  sys_cpu_clk sys_ps7/FCLK_CLK0
 ad_connect  sys_200m_clk sys_ps7/FCLK_CLK1
 ad_connect  sys_cpu_reset sys_rstgen/peripheral_reset
@@ -135,17 +119,6 @@ ad_connect  spi0_clk_o sys_ps7/SPI0_SCLK_O
 ad_connect  spi0_sdo_i sys_ps7/SPI0_MOSI_I
 ad_connect  spi0_sdo_o sys_ps7/SPI0_MOSI_O
 ad_connect  spi0_sdi_i sys_ps7/SPI0_MISO_I
-
-# axi spi connections
-
-ad_connect  sys_cpu_clk  axi_spi/ext_spi_clk
-ad_connect  spi_csn_i  axi_spi/ss_i
-ad_connect  spi_csn_o  axi_spi/ss_o
-ad_connect  spi_clk_i  axi_spi/sck_i
-ad_connect  spi_clk_o  axi_spi/sck_o
-ad_connect  spi_sdo_i  axi_spi/io0_i
-ad_connect  spi_sdo_o  axi_spi/io0_o
-ad_connect  spi_sdi_i  axi_spi/io1_i
 
 # interrupts
 
@@ -243,7 +216,7 @@ ad_connect  txnrx axi_ad9361/txnrx
 ad_connect  up_enable axi_ad9361/up_enable
 ad_connect  up_txnrx axi_ad9361/up_txnrx
 
-ad_connect  axi_ad9361/tdd_sync GND
+#ad_connect  axi_ad9361/tdd_sync GND
 ad_connect  sys_200m_clk axi_ad9361/delay_clk
 ad_connect  axi_ad9361/l_clk axi_ad9361/clk
 
@@ -313,7 +286,20 @@ ad_connect  axi_ad9361/l_clk axi_ad9361_adc_dma/fifo_wr_clk
 ad_connect  axi_ad9361/l_clk axi_ad9361_dac_dma/m_axis_aclk
 ad_connect  cpack/fifo_wr_overflow axi_ad9361/adc_dovf
 
-# External TDD
+# TDD_SYNC
+ad_ip_instance util_tdd_sync util_ad9361_tdd_sync
+ad_ip_parameter util_ad9361_tdd_sync CONFIG.TDD_SYNC_PERIOD 10000000
+
+create_bd_port -dir I tdd_sync
+
+ad_connect  tdd_sync util_ad9361_tdd_sync/sync_in
+ad_connect  sys_cpu_clk util_ad9361_tdd_sync/clk
+ad_connect  sys_cpu_resetn util_ad9361_tdd_sync/rstn
+ad_connect  util_ad9361_tdd_sync/sync_out axi_ad9361/tdd_sync
+ad_connect  util_ad9361_tdd_sync/sync_mode axi_ad9361/tdd_sync_cntr
+
+# External TDD <==== To do, check this section
+
 set TDD_CHANNEL_CNT 3
 set TDD_DEFAULT_POL 0b010
 set TDD_REG_WIDTH 32
@@ -355,7 +341,6 @@ ad_connect  logic_or_1/Res  tx_upack/reset
 ad_cpu_interconnect 0x79020000 axi_ad9361
 ad_cpu_interconnect 0x7C400000 axi_ad9361_adc_dma
 ad_cpu_interconnect 0x7C420000 axi_ad9361_dac_dma
-ad_cpu_interconnect 0x7C430000 axi_spi
 ad_cpu_interconnect 0x7C440000 axi_tdd_0
 
 ad_ip_parameter sys_ps7 CONFIG.PCW_USE_S_AXI_HP1 {1}
@@ -385,5 +370,4 @@ ad_connect sys_cpu_resetn axi_ad9361_dac_dma/m_src_axi_aresetn
 
 ad_cpu_interrupt ps-13 mb-13 axi_ad9361_adc_dma/irq
 ad_cpu_interrupt ps-12 mb-12 axi_ad9361_dac_dma/irq
-ad_cpu_interrupt ps-11 mb-11 axi_spi/ip2intc_irpt
 
