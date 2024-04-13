@@ -142,13 +142,13 @@ ad_connect  sys_concat_intc/In0 GND
 
 # iic
 
-create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 iic_main
+#create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 iic_main
 
-ad_ip_instance axi_iic axi_iic_main
+#ad_ip_instance axi_iic axi_iic_main
 
-ad_connect  iic_main axi_iic_main/iic
-ad_cpu_interconnect 0x41600000 axi_iic_main
-ad_cpu_interrupt ps-15 mb-15 axi_iic_main/iic2intc_irpt
+#ad_connect  iic_main axi_iic_main/iic
+#ad_cpu_interconnect 0x41600000 axi_iic_main
+#ad_cpu_interrupt ps-15 mb-15 axi_iic_main/iic2intc_irpt
 
 # ad9361
 
@@ -270,13 +270,13 @@ ad_connect axi_ad9361/dac_data_q1 tx_upack/fifo_rd_data_3
 
 ad_connect tx_upack/s_axis  axi_ad9361_dac_dma/m_axis
 
-ad_ip_instance util_vector_logic logic_or [list \
-  C_OPERATION {or} \
-  C_SIZE 1]
+#ad_ip_instance util_vector_logic logic_or [list \
+#  C_OPERATION {or} \
+#  C_SIZE 1]
 
-ad_connect  logic_or/Op1  tx_fir_interpolator/valid_out_0
-ad_connect  logic_or/Op2  axi_ad9361/dac_valid_i1
-ad_connect  logic_or/Res  tx_upack/fifo_rd_en
+#ad_connect  logic_or/Op1  tx_fir_interpolator/valid_out_0
+#ad_connect  logic_or/Op2  axi_ad9361/dac_valid_i1
+#ad_connect  logic_or/Res  tx_upack/fifo_rd_en
 ad_connect  tx_upack/fifo_rd_underflow axi_ad9361/dac_dunf
 
 ad_connect axi_ad9361/up_dac_gpio_out interp_slice/Din
@@ -300,48 +300,48 @@ ad_connect  util_ad9361_tdd_sync/sync_mode axi_ad9361/tdd_sync_cntr
 
 # External TDD <==== To do, check this section
 
-set TDD_CHANNEL_CNT 3
-set TDD_DEFAULT_POL 0b010
-set TDD_REG_WIDTH 32
-set TDD_BURST_WIDTH 32
-set TDD_SYNC_WIDTH 0
-set TDD_SYNC_INT 0
-set TDD_SYNC_EXT 1
-set TDD_SYNC_EXT_CDC 1
-ad_tdd_gen_create axi_tdd_0 $TDD_CHANNEL_CNT \
-                            $TDD_DEFAULT_POL \
-                            $TDD_REG_WIDTH \
-                            $TDD_BURST_WIDTH \
-                            $TDD_SYNC_WIDTH \
-                            $TDD_SYNC_INT \
-                            $TDD_SYNC_EXT \
-                            $TDD_SYNC_EXT_CDC
+#set TDD_CHANNEL_CNT 3
+#set TDD_DEFAULT_POL 0b010
+#set TDD_REG_WIDTH 32
+#set TDD_BURST_WIDTH 32
+#set TDD_SYNC_WIDTH 0
+#set TDD_SYNC_INT 0
+#set TDD_SYNC_EXT 1
+#set TDD_SYNC_EXT_CDC 1
+#ad_tdd_gen_create axi_tdd_0 $TDD_CHANNEL_CNT \
+#                            $TDD_DEFAULT_POL \
+#                            $TDD_REG_WIDTH \
+#                            $TDD_BURST_WIDTH \
+#                            $TDD_SYNC_WIDTH \
+#                            $TDD_SYNC_INT \
+#                            $TDD_SYNC_EXT \
+#                            $TDD_SYNC_EXT_CDC
 
-ad_ip_instance util_vector_logic logic_inv [list \
-  C_OPERATION {not} \
-  C_SIZE 1]
+#ad_ip_instance util_vector_logic logic_inv [list \
+#  C_OPERATION {not} \
+#  C_SIZE 1]
 
-ad_ip_instance util_vector_logic logic_or_1 [list \
-  C_OPERATION {or} \
-  C_SIZE 1]
+#ad_ip_instance util_vector_logic logic_or_1 [list \
+#  C_OPERATION {or} \
+#  C_SIZE 1]
 
-ad_connect logic_inv/Op1  axi_ad9361/rst
-ad_connect logic_inv/Res  axi_tdd_0/resetn
-ad_connect axi_ad9361/l_clk axi_tdd_0/clk
-ad_connect axi_tdd_0/sync_in tdd_ext_sync
-ad_connect axi_tdd_0/tdd_channel_0 txdata_o
-ad_connect axi_tdd_0/tdd_channel_1 axi_ad9361_adc_dma/fifo_wr_sync
+#ad_connect logic_inv/Op1  axi_ad9361/rst
+#ad_connect logic_inv/Res  axi_tdd_0/resetn
+#ad_connect axi_ad9361/l_clk axi_tdd_0/clk
+#ad_connect axi_tdd_0/sync_in tdd_ext_sync
+#ad_connect axi_tdd_0/tdd_channel_0 txdata_o
+#ad_connect axi_tdd_0/tdd_channel_1 axi_ad9361_adc_dma/fifo_wr_sync
 
-ad_connect  logic_or_1/Op1  axi_ad9361/rst
-ad_connect  logic_or_1/Op2  axi_tdd_0/tdd_channel_2
-ad_connect  logic_or_1/Res  tx_upack/reset
+#ad_connect  logic_or_1/Op1  axi_ad9361/rst
+#ad_connect  logic_or_1/Op2  axi_tdd_0/tdd_channel_2
+#ad_connect  logic_or_1/Res  tx_upack/reset
 
 # interconnects
 
 ad_cpu_interconnect 0x79020000 axi_ad9361
 ad_cpu_interconnect 0x7C400000 axi_ad9361_adc_dma
 ad_cpu_interconnect 0x7C420000 axi_ad9361_dac_dma
-ad_cpu_interconnect 0x7C440000 axi_tdd_0
+#ad_cpu_interconnect 0x7C440000 axi_tdd_0
 
 ad_ip_parameter sys_ps7 CONFIG.PCW_USE_S_AXI_HP1 {1}
 ad_connect sys_cpu_clk sys_ps7/S_AXI_HP1_ACLK
