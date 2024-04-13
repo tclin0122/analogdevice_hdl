@@ -82,7 +82,7 @@ module system_top (
   input           spi_miso,
 
   input           pl_gpio0,
-  input           pl_gpio1,
+  output          pl_gpio1,
   inout           pl_gpio2,
   inout           pl_gpio3,
   inout           pl_gpio4
@@ -94,13 +94,7 @@ module system_top (
   wire    [17:0]  gpio_o;
   wire    [17:0]  gpio_t;
 
-  //wire            iic_scl;
-  //wire            iic_sda;
-  wire            phaser_enable;
-  wire            pl_burst;
-  wire            pl_muxout;
   wire            pps_s;
-  wire            pl_txdata;
 
   // instantiations
 
@@ -116,28 +110,12 @@ module system_top (
               gpio_status}));     //  7: 0
 
   assign gpio_i[16:14] = gpio_o[16:14];
-  assign gpio_i[17] = pl_muxout;
-  assign phaser_enable = gpio_o[14];
-
-  //assign pl_gpio4 = iic_scl;      //PL_GPIO4
-  //assign pl_gpio3 = iic_sda;      //PL_GPIO3
-
-  //PL_GPIO2
-  ad_iobuf #(
-    .DATA_WIDTH(1)
-  ) i_pl_gpio_iobuf (
-    .dio_t (phaser_enable),
-    .dio_i (pl_spi_clk_o),
-    .dio_o (pl_muxout),
-    .dio_p (pl_gpio2));
-
-  //PL_GPIO1
-  //assign pl_spi_miso = pl_gpio1 & ~phaser_enable;
-  //assign pl_burst    = pl_gpio1 &  phaser_enable;
 
   //PL_GPIO0
   assign pps_s = pl_gpio0;
-  
+  //PL_GPIO1
+  assign pl_gpio1 = pl_gpio0;
+
   system_wrapper i_system_wrapper (
     .ddr_addr (ddr_addr),
     .ddr_ba (ddr_ba),
@@ -164,8 +142,6 @@ module system_top (
     .gpio_i (gpio_i),
     .gpio_o (gpio_o),
     .gpio_t (gpio_t),
-    //.iic_main_scl_io (iic_scl),
-    //.iic_main_sda_io (iic_sda),
     .rx_clk_in (rx_clk_in),
     .rx_data_in (rx_data_in),
     .rx_frame_in (rx_frame_in),
@@ -181,8 +157,6 @@ module system_top (
     .spi0_sdo_o (spi_mosi),
 
     .tdd_sync (pps_s),
-    //.tdd_ext_sync(pl_burst),
-    .txdata_o(pl_txdata),
 
     .tx_clk_out (tx_clk_out),
     .tx_data_out (tx_data_out),
