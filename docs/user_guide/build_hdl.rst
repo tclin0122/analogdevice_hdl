@@ -332,8 +332,6 @@ Running the command below will create a folder named **LVDSCMOSN1**.
 
    make LVDS_CMOS_N=1
 
-
-
 Enabling Out-of-Context synthesis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -691,8 +689,8 @@ Windows environment setup
 
 The best option on Windows is to use
 `Cygwin <https://www.cygwin.com>`__. When installing it, select the
-``make`` and ``git`` packages. The manual changes to your **.bashrc** do a lot
-look like that of the Linux environment.
+``make`` and ``git`` packages. You should do changes to your **.bashrc**
+in a similar manner to the Linux environment.
 
 .. code-block:: bash
 
@@ -700,8 +698,8 @@ look like that of the Linux environment.
    export PATH=$PATH:/cygdrive/d/intelFPGA_pro/2x.x/quartus/bin64
 
 A very good alternative to Cygwin is
-`WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__. The
-manual changes to your **.bashrc** should look like:
+`WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__. The changes
+to your **.bashrc** should look like:
 
 .. code-block:: bash
 
