@@ -282,7 +282,8 @@ ad_connect  sys_cpu_clk util_ad9361_tdd_sync/clk
 ad_connect  sys_cpu_resetn util_ad9361_tdd_sync/rstn
 ad_connect  util_ad9361_tdd_sync/sync_out axi_ad9361/tdd_sync
 ad_connect  util_ad9361_tdd_sync/sync_mode axi_ad9361/tdd_sync_cntr
-ad_connect  tdd_sync_out util_ad9361_tdd_sync/sync_out 
+ad_connect  tdd_sync_out sys_cpu_resetn 
+
 
 # interconnects
 
