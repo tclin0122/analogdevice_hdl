@@ -393,13 +393,8 @@ if {[info exists FMCOMMS8]} {
   if {$TX_NUM_OF_LANES == 16} {
     ad_xcvrcon  util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a
   } else {
-    if {$TX_NUM_OF_LANES == 8} {
-      # TX_JESD_L=8 it is recommanded to use RX_OS_JESD_M=TX_JESD_M because they share the same device clock
-      ad_xcvrcon  util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a {} $MAX_TX_NUM_OF_LANES {0 1 4 5 8 9 12 13}
-    } else {
-      # TX_JESD_L=4
-      ad_xcvrcon  util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a {} $MAX_TX_NUM_OF_LANES {0 4 8 12}
-    }
+    #TX_JESD_L=8 it is recommanded to use RX_OS_JESD_M=TX_JESD_M because they share the same device clock
+    ad_xcvrcon  util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a {} $MAX_TX_NUM_OF_LANES {0 1 4 5 9 8 12 13}
   }
 
   # Rx
@@ -542,13 +537,8 @@ if {[info exists FMCOMMS8]} {
   if {$TX_NUM_OF_LANES == 8} {
     ad_xcvrcon  util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a
   } else {
-    if {$TX_NUM_OF_LANES == 4} {
-    # TX_JESD_L=4, it is recommanded to use RX_OS_JESD_M=TX_JESD_M because they share the same device clock
+    #TX_JESD_L=4, it is recommanded to use RX_OS_JESD_M=TX_JESD_M because they share the same device clock
     ad_xcvrcon  util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a {} $MAX_TX_NUM_OF_LANES {0 1 4 5}
-    } else {
-      # TX_JESD_L=2
-      ad_xcvrcon util_adrv9009_som_xcvr axi_adrv9009_som_tx_xcvr axi_adrv9009_som_tx_jesd {} core_clk_a {} $MAX_TX_NUM_OF_LANES {0 4}
-    }
   }
 
   # Rx

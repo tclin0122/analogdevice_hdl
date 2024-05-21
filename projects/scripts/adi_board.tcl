@@ -281,9 +281,11 @@ proc ad_disconnect {p_name_1 p_name_2} {
   }
 
   if {[get_property CLASS $m_name_1] eq "bd_pin"} {
-    delete_bd_objs -quiet [get_bd_nets -quiet -of_objects \
-      [find_bd_objs -relation connected_to $m_name_1]]
-    delete_bd_objs -quiet $m_name_1
+
+    set p_net [get_bd_nets -of_objects [get_bd_pins $p_name_1]]
+    set p_pin [get_bd_pins $p_name_1]
+
+    disconnect_bd_net $p_net $p_pin
     return
   }
 }
@@ -456,18 +458,18 @@ proc ad_xcvrcon {u_xcvr a_xcvr a_jesd {lane_map {}} {link_clk {}} {device_clk {}
           set phys_lane $m
         }
 
-        if {$tx_or_rx_n == 0} {
-          ad_connect  ${a_xcvr}/up_es_${n} ${u_xcvr}/up_es_${phys_lane}
-        }
+      if {$tx_or_rx_n == 0} {
+        ad_connect  ${a_xcvr}/up_es_${n} ${u_xcvr}/up_es_${phys_lane}
+      }
 
-        if {(($n%4) == 0) && ($qpll_enable == 1)} {
-          ad_connect  ${a_xcvr}/up_cm_${n} ${u_xcvr}/up_cm_${m}
-        }
-        ad_connect  ${a_xcvr}/up_ch_${n} ${u_xcvr}/up_${txrx}_${phys_lane}
-        ad_connect  ${link_clk} ${u_xcvr}/${txrx}_clk_${phys_lane}
-        if {$use_2x_clk == 1} {
-          ad_connect  ${link_clk_2x} ${u_xcvr}/${txrx}_clk_2x_${phys_lane}
-        }
+      if {(($n%4) == 0) && ($qpll_enable == 1)} {
+        ad_connect  ${a_xcvr}/up_cm_${n} ${u_xcvr}/up_cm_${n}
+      }
+      ad_connect  ${a_xcvr}/up_ch_${n} ${u_xcvr}/up_${txrx}_${phys_lane}
+      ad_connect  ${link_clk} ${u_xcvr}/${txrx}_clk_${phys_lane}
+      if {$use_2x_clk == 1} {
+        ad_connect  ${link_clk_2x} ${u_xcvr}/${txrx}_clk_2x_${phys_lane}
+      }
 
         create_bd_port -dir ${data_dir} ${m_data}_${m}_p
         create_bd_port -dir ${data_dir} ${m_data}_${m}_n

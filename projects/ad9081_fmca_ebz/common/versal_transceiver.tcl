@@ -9,7 +9,6 @@ proc create_versal_phy {
   {rx_lane_rate 24.75}
   {tx_lane_rate 24.75}
   {ref_clock 375}
-  {intf_cfg RXTX}
 } {
 
 set num_quads [expr int(round(1.0 * $num_lanes / 4))]
