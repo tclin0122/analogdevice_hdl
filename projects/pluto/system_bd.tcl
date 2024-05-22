@@ -26,17 +26,6 @@ create_bd_port -dir I -from 17 -to 0 gpio_i
 create_bd_port -dir O -from 17 -to 0 gpio_o
 create_bd_port -dir O -from 17 -to 0 gpio_t
 
-create_bd_port -dir O spi_csn_o
-create_bd_port -dir I spi_csn_i
-create_bd_port -dir I spi_clk_i
-create_bd_port -dir O spi_clk_o
-create_bd_port -dir I spi_sdo_i
-create_bd_port -dir O spi_sdo_o
-create_bd_port -dir I spi_sdi_i
-
-create_bd_port -dir O txdata_o
-create_bd_port -dir I tdd_ext_sync
-
 # instance: sys_ps7
 
 ad_ip_instance processing_system7 sys_ps7
@@ -102,13 +91,6 @@ ad_ip_parameter sys_rstgen CONFIG.C_EXT_RST_WIDTH 1
 
 # system reset/clock definitions
 
-# add external spi
-
-ad_ip_instance axi_quad_spi axi_spi
-ad_ip_parameter axi_spi CONFIG.C_USE_STARTUP 0
-ad_ip_parameter axi_spi CONFIG.C_NUM_SS_BITS 1
-ad_ip_parameter axi_spi CONFIG.C_SCK_RATIO 8
-
 ad_connect  sys_cpu_clk sys_ps7/FCLK_CLK0
 ad_connect  sys_200m_clk sys_ps7/FCLK_CLK1
 ad_connect  sys_cpu_reset sys_rstgen/peripheral_reset
@@ -136,17 +118,6 @@ ad_connect  spi0_sdo_i sys_ps7/SPI0_MOSI_I
 ad_connect  spi0_sdo_o sys_ps7/SPI0_MOSI_O
 ad_connect  spi0_sdi_i sys_ps7/SPI0_MISO_I
 
-# axi spi connections
-
-ad_connect  sys_cpu_clk  axi_spi/ext_spi_clk
-ad_connect  spi_csn_i  axi_spi/ss_i
-ad_connect  spi_csn_o  axi_spi/ss_o
-ad_connect  spi_clk_i  axi_spi/sck_i
-ad_connect  spi_clk_o  axi_spi/sck_o
-ad_connect  spi_sdo_i  axi_spi/io0_i
-ad_connect  spi_sdo_o  axi_spi/io0_o
-ad_connect  spi_sdi_i  axi_spi/io1_i
-
 # interrupts
 
 ad_connect  sys_concat_intc/dout sys_ps7/IRQ_F2P
@@ -166,16 +137,6 @@ ad_connect  sys_concat_intc/In3 GND
 ad_connect  sys_concat_intc/In2 GND
 ad_connect  sys_concat_intc/In1 GND
 ad_connect  sys_concat_intc/In0 GND
-
-# iic
-
-create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 iic_main
-
-ad_ip_instance axi_iic axi_iic_main
-
-ad_connect  iic_main axi_iic_main/iic
-ad_cpu_interconnect 0x41600000 axi_iic_main
-ad_cpu_interrupt ps-15 mb-15 axi_iic_main/iic2intc_irpt
 
 # ad9361
 
@@ -276,10 +237,10 @@ ad_connect rx_fir_decimator/active decim_slice/Dout
 
 ad_connect axi_ad9361/l_clk tx_fir_interpolator/aclk
 
-ad_connect axi_ad9361/dac_enable_i0 tx_fir_interpolator/dac_enable_0
+#ad_connect axi_ad9361/dac_enable_i0 tx_fir_interpolator/dac_enable_0
 ad_connect axi_ad9361/dac_valid_i0 tx_fir_interpolator/dac_valid_0
 ad_connect axi_ad9361/dac_data_i0 tx_fir_interpolator/data_out_0
-ad_connect axi_ad9361/dac_enable_q0 tx_fir_interpolator/dac_enable_1
+#ad_connect axi_ad9361/dac_enable_q0 tx_fir_interpolator/dac_enable_1
 ad_connect axi_ad9361/dac_valid_q0 tx_fir_interpolator/dac_valid_1
 ad_connect axi_ad9361/dac_data_q0 tx_fir_interpolator/data_out_1
 
@@ -297,13 +258,15 @@ ad_connect axi_ad9361/dac_data_q1 tx_upack/fifo_rd_data_3
 
 ad_connect tx_upack/s_axis  axi_ad9361_dac_dma/m_axis
 
-ad_ip_instance util_vector_logic logic_or [list \
-  C_OPERATION {or} \
+# DMA and gate
+ad_ip_instance util_vector_logic logic_and [list \
+  C_OPERATION {and} \
   C_SIZE 1]
 
-ad_connect  logic_or/Op1  tx_fir_interpolator/valid_out_0
-ad_connect  logic_or/Op2  axi_ad9361/dac_valid_i1
-ad_connect  logic_or/Res  tx_upack/fifo_rd_en
+ad_ip_instance util_vector_logic logic_and_1 [list \
+  C_OPERATION {and} \
+  C_SIZE 1]
+
 ad_connect  tx_upack/fifo_rd_underflow axi_ad9361/dac_dunf
 
 ad_connect axi_ad9361/up_dac_gpio_out interp_slice/Din
@@ -313,50 +276,32 @@ ad_connect  axi_ad9361/l_clk axi_ad9361_adc_dma/fifo_wr_clk
 ad_connect  axi_ad9361/l_clk axi_ad9361_dac_dma/m_axis_aclk
 ad_connect  cpack/fifo_wr_overflow axi_ad9361/adc_dovf
 
-# External TDD
-set TDD_CHANNEL_CNT 3
-set TDD_DEFAULT_POL 0b010
-set TDD_REG_WIDTH 32
-set TDD_BURST_WIDTH 32
-set TDD_SYNC_WIDTH 0
-set TDD_SYNC_INT 0
-set TDD_SYNC_EXT 1
-set TDD_SYNC_EXT_CDC 1
-ad_tdd_gen_create axi_tdd_0 $TDD_CHANNEL_CNT \
-                            $TDD_DEFAULT_POL \
-                            $TDD_REG_WIDTH \
-                            $TDD_BURST_WIDTH \
-                            $TDD_SYNC_WIDTH \
-                            $TDD_SYNC_INT \
-                            $TDD_SYNC_EXT \
-                            $TDD_SYNC_EXT_CDC
+# dma-tdd-sync
 
-ad_ip_instance util_vector_logic logic_inv [list \
-  C_OPERATION {not} \
-  C_SIZE 1]
+ad_ip_instance dma_tdd_sync dma_tdd_sync
+ad_ip_parameter dma_tdd_sync CONFIG.TDD_SYNC_PERIOD 10000000
 
-ad_ip_instance util_vector_logic logic_or_1 [list \
-  C_OPERATION {or} \
-  C_SIZE 1]
+create_bd_port -dir I tdd_sync
+create_bd_port -dir O tdd_sync_out
 
-ad_connect logic_inv/Op1  axi_ad9361/rst
-ad_connect logic_inv/Res  axi_tdd_0/resetn
-ad_connect axi_ad9361/l_clk axi_tdd_0/clk
-ad_connect axi_tdd_0/sync_in tdd_ext_sync
-ad_connect axi_tdd_0/tdd_channel_0 txdata_o
-ad_connect axi_tdd_0/tdd_channel_1 axi_ad9361_adc_dma/fifo_wr_sync
+ad_connect  tdd_sync dma_tdd_sync/sync_in
+ad_connect  sys_cpu_clk dma_tdd_sync/clk
+ad_connect  sys_cpu_resetn dma_tdd_sync/rstn
+ad_connect  dma_tdd_sync/sync_out tdd_sync_out
 
-ad_connect  logic_or_1/Op1  axi_ad9361/rst
-ad_connect  logic_or_1/Op2  axi_tdd_0/tdd_channel_2
-ad_connect  logic_or_1/Res  tx_upack/reset
+ad_connect  logic_and/Op1  dma_tdd_sync/sync_out
+ad_connect  logic_and/Op2  axi_ad9361/dac_enable_i0 
+ad_connect  logic_and/Res  tx_fir_interpolator/dac_enable_0
+
+ad_connect  logic_and_1/Op1  dma_tdd_sync/sync_out
+ad_connect  logic_and_1/Op2  axi_ad9361/dac_enable_q0
+ad_connect  logic_and_1/Res  tx_fir_interpolator/dac_enable_1
 
 # interconnects
 
 ad_cpu_interconnect 0x79020000 axi_ad9361
 ad_cpu_interconnect 0x7C400000 axi_ad9361_adc_dma
 ad_cpu_interconnect 0x7C420000 axi_ad9361_dac_dma
-ad_cpu_interconnect 0x7C430000 axi_spi
-ad_cpu_interconnect 0x7C440000 axi_tdd_0
 
 ad_ip_parameter sys_ps7 CONFIG.PCW_USE_S_AXI_HP1 {1}
 ad_connect sys_cpu_clk sys_ps7/S_AXI_HP1_ACLK
@@ -385,5 +330,4 @@ ad_connect sys_cpu_resetn axi_ad9361_dac_dma/m_src_axi_aresetn
 
 ad_cpu_interrupt ps-13 mb-13 axi_ad9361_adc_dma/irq
 ad_cpu_interrupt ps-12 mb-12 axi_ad9361_dac_dma/irq
-ad_cpu_interrupt ps-11 mb-11 axi_spi/ip2intc_irpt
 
