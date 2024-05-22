@@ -279,7 +279,7 @@ ad_connect  cpack/fifo_wr_overflow axi_ad9361/adc_dovf
 # dma-tdd-sync
 
 ad_ip_instance dma_tdd_sync dma_tdd_sync
-ad_ip_parameter dma_tdd_sync CONFIG.TDD_SYNC_PERIOD 10000000
+ad_ip_parameter dma_tdd_sync CONFIG.PULSE_WIDTH 10000
 
 create_bd_port -dir I tdd_sync
 create_bd_port -dir O tdd_sync_out
